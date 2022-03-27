@@ -322,6 +322,15 @@ fn get_visible_width(input: &str) -> usize {
         }
     }
 
+    for (idx, _) in input.match_indices("\x1B]8;;") {
+        let (_, s) = input.split_at(idx);
+
+        let m_pos = s.find("\x1B\x5C");
+        if let Some(len) = m_pos {
+            nb_invisible_char += len
+        }
+    }
+
     UnicodeWidthStr::width(input) - nb_invisible_char
 }
 
@@ -365,6 +374,7 @@ mod tests {
     use super::*;
     use crate::color;
     use crate::color::Colors;
+    use crate::flags::HyperlinkOption;
     use crate::icon::Icons;
     use crate::meta::{FileType, Name};
     use crate::Config;
@@ -396,7 +406,7 @@ mod tests {
                     &Colors::new(color::ThemeOption::NoColor),
                     &Icons::new(icon::Theme::NoIcon, " ".to_string()),
                     &DisplayOption::FileName,
-                    false,
+                    HyperlinkOption::Never,
                 )
                 .to_string();
 
@@ -430,7 +440,7 @@ mod tests {
                     &Colors::new(color::ThemeOption::NoColor),
                     &Icons::new(icon::Theme::Fancy, " ".to_string()),
                     &DisplayOption::FileName,
-                    false,
+                    HyperlinkOption::Never,
                 )
                 .to_string();
 
@@ -463,7 +473,7 @@ mod tests {
                     &Colors::new(color::ThemeOption::NoLscolors),
                     &Icons::new(icon::Theme::NoIcon, " ".to_string()),
                     &DisplayOption::FileName,
-                    false,
+                    HyperlinkOption::Never,
                 )
                 .to_string();
 
@@ -505,7 +515,7 @@ mod tests {
                     &Colors::new(color::ThemeOption::NoColor),
                     &Icons::new(icon::Theme::NoIcon, " ".to_string()),
                     &DisplayOption::FileName,
-                    false,
+                    HyperlinkOption::Never,
                 )
                 .to_string();
 
