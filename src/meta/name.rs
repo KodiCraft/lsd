@@ -106,13 +106,17 @@ impl Name {
     fn hyperlink(&self, name: String, hyperlink: HyperlinkOption) -> String {
         match hyperlink {
             HyperlinkOption::Always => {
-                // HyperlinkOption::Auto gets converted to None or Always in core.rs based on tty_available
-                let real_path = std::fs::canonicalize(&self.path).expect("unable to find file");
-                let url = Url::from_file_path(&real_path).expect("unable to compute url from file");
-
-                // Crossterm does not support hyperlinks as of now
-                // https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
-                format!("\x1B]8;;{}\x1B\x5C{}\x1B]8;;\x1B\x5C", url, name)
+                // This is a very basic fix
+                if self.path.exists() {
+                    // HyperlinkOption::Auto gets converted to None or Always in core.rs based on tty_available
+                    let real_path = std::fs::canonicalize(&self.path).expect("unable to find file"); // Canonicalize just panics if the file doesn't exist, the expect can only be called if the path is invalid, which should never happen
+                    let url = Url::from_file_path(&real_path).expect("unable to compute url from file");
+                    // Crossterm does not support hyperlinks as of now
+                    // https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
+                    format!("\x1B]8;;{}\x1B\x5C{}\x1B]8;;\x1B\x5C", url, name)
+                } else {
+                    name
+                }
             }
             _ => name,
         }
