@@ -28,10 +28,15 @@ impl Name {
             Some(name) => name.to_string_lossy().to_string(),
             None => path.to_string_lossy().to_string(),
         };
+        
 
-        let extension = path
-            .extension()
-            .map(|ext| ext.to_string_lossy().to_string());
+        let extension = match path.exists() {
+            true => path
+                        .extension()
+                        .map(|ext| ext.to_string_lossy().to_string()),
+
+            false => None,
+        };
 
         Self {
             name,
